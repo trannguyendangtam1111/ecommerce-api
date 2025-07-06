@@ -39,11 +39,13 @@ A simple yet complete **E-Commerce REST API** built with **Java Spring Boot**, s
 | `POST /api/auth/register`       | Public            |
 | `POST /api/auth/login`          | Public            |
 | `GET /api/products`             | Public            |
+| `GET /api/products/search`      | Public            |
 | `POST/PUT/DELETE /api/products` | ROLE_ADMIN        |
 | `GET /api/cart`                 | ROLE_CUSTOMER     |
 | `POST /api/cart`                | ROLE_CUSTOMER     |
 | `POST /api/orders`              | ROLE_CUSTOMER     |
 | `GET /api/orders/me`            | ROLE_CUSTOMER     |
+| `GET /api/orders`               | ROLE_ADMIN        |
 
 ---
 
