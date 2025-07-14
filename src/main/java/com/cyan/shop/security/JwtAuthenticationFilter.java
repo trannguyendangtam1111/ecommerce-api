@@ -1,10 +1,12 @@
 package com.cyan.shop.security;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,21 +36,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String role = null;
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);
-            email = jwtUtil.extractEmail(jwt);
-            role = jwtUtil.extractRole(jwt);
-            authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
-        }
+        try{
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                jwt = authHeader.substring(7);
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            if (jwtUtil.isTokenValid(jwt)){
+                if (!jwtUtil.isTokenValid(jwt)){
+                    throw new JwtException("Invalid or expired JWT token");
+                }
+
+                email = jwtUtil.extractEmail(jwt);
+                role = jwtUtil.extractRole(jwt);
+                authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+            }
+
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(email, null, authorities);
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
+            filterChain.doFilter(request, response);
+        } catch (JwtException ex) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType("application/json");
+            response.getWriter().write("{\"status\":401,\"message\":\"" + ex.getMessage() + "\"}");
+            return;
         }
-        filterChain.doFilter(request, response);
     }
 }

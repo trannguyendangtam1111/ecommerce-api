@@ -9,10 +9,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -33,4 +32,8 @@ public class AuthController {
         return ResponseEntity.ok(userService.login(request));
     }
 
+//    @DeleteMapping("/delete")
+//    public ResponseEntity<String> delete(@AuthenticationPrincipal String email) {
+//        return ResponseEntity.ok(userService.deleteUserByEmail(email));
+//    }
 }

@@ -5,6 +5,7 @@ import com.cyan.shop.dto.LoginResponse;
 import com.cyan.shop.dto.RegisterRequest;
 import com.cyan.shop.dto.UserResponse;
 import com.cyan.shop.entity.User;
+import com.cyan.shop.exception.NotFoundException;
 import com.cyan.shop.repository.UserRepository;
 import com.cyan.shop.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -64,4 +65,20 @@ public class UserService {
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
         return new LoginResponse(token);
     }
+
+//    public String deleteUser(String token) {
+//        String email = jwtUtil.extractEmail(token);
+//        User user = userRepository.findByEmail(email)
+//                .orElseThrow(() -> new NotFoundException("User not found"));
+//        userRepository.delete(user);
+//        return "User deleted successfully";
+//    }
+//
+//    public String deleteUserByEmail(String email) {
+//        User user = userRepository.findByEmail(email)
+//                .orElseThrow(() -> new NotFoundException("User not found"));
+//        userRepository.deleteByEmail(email);
+//        userRepository.delete(user);
+//        return "User deleted successfully";
+//    }
 }
