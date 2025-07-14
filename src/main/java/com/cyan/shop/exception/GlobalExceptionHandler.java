@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
                 .body(Map.of("message", ex.getMessage()));
     }
 
-    @ExceptionHandler(io.jsonwebtoken.JwtException.class)
+    @ExceptionHandler(JwtException.class)
     public ResponseEntity<Map<String, Object>> handleJwtException(JwtException ex) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("status", HttpStatus.UNAUTHORIZED.value());
