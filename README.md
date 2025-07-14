@@ -39,11 +39,13 @@ A simple yet complete **E-Commerce REST API** built with **Java Spring Boot**, s
 | `POST /api/auth/register`       | Public            |
 | `POST /api/auth/login`          | Public            |
 | `GET /api/products`             | Public            |
+| `GET /api/products/search`      | Public            |
 | `POST/PUT/DELETE /api/products` | ROLE_ADMIN        |
 | `GET /api/cart`                 | ROLE_CUSTOMER     |
 | `POST /api/cart`                | ROLE_CUSTOMER     |
 | `POST /api/orders`              | ROLE_CUSTOMER     |
 | `GET /api/orders/me`            | ROLE_CUSTOMER     |
+| `GET /api/orders`               | ROLE_ADMIN        |
 
 ---
 
@@ -90,7 +92,6 @@ http://localhost:8080/swagger-ui/index.html
 ## 📌 Notes
 
 - Default role when registering is `ROLE_CUSTOMER`
-- Cart data will be cleared after placing an order
 - All APIs are protected by JWT
 - Exception handling is implemented for clean REST errors
 
@@ -98,12 +99,11 @@ http://localhost:8080/swagger-ui/index.html
 
 ## 👤 Author
 
-- **Name:** Cyan Tran
-- **Role:** Java Backend Developer (Fresher)
-- **Email:** [cyan@gmail.com](mailto:cyan@gmail.com)
+- **Name:** Tran Nguyen Dang Tam
+- **Email:** [trannguyendangtam1111@gmail.com](mailto:trannguyendangtam1111@gmail.com)
 
 ---
 
 ## 📝 License
 
-MIT License. Free for learning, education, and portfolio use.
+
