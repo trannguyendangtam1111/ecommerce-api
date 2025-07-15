@@ -5,6 +5,8 @@ import com.cyan.shop.dto.LoginResponse;
 import com.cyan.shop.dto.RegisterRequest;
 import com.cyan.shop.dto.UserResponse;
 import com.cyan.shop.entity.User;
+import com.cyan.shop.exception.EmailAlreadyExistsException;
+import com.cyan.shop.exception.NameAlreadyExistsException;
 import com.cyan.shop.exception.NotFoundException;
 import com.cyan.shop.repository.UserRepository;
 import com.cyan.shop.security.JwtUtil;
@@ -21,8 +23,13 @@ public class UserService {
 
     public String register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exists");
+            throw new EmailAlreadyExistsException("Email already exists");
         }
+
+        if(userRepository.existsByName(request.getName())) {
+            throw new NameAlreadyExistsException("Name already exists");
+        }
+
 
         User user = User.builder()
                 .name(request.getName())
