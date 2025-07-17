@@ -1,5 +1,6 @@
 package com.cyan.shop.controller;
 
+import com.cyan.shop.dto.ProductRequest;
 import com.cyan.shop.dto.ProductResponse;
 import com.cyan.shop.entity.Product;
 import com.cyan.shop.service.ProductService;
@@ -27,8 +28,8 @@ public class ProductController {
     @PostMapping
     @Operation(summary = "Create product")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Product> create(@RequestBody Product product) {
-        return ResponseEntity.ok(productService.create(product));
+    public ResponseEntity<ProductResponse> create(@RequestBody ProductRequest request) {
+        return ResponseEntity.ok(productService.create(request));
     }
 
     @SecurityRequirement(name = "bearerAuth")
@@ -40,15 +41,15 @@ public class ProductController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get product by Id")
-    public ResponseEntity<Product> getById(@PathVariable Long id) {
+    public ResponseEntity<ProductResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(productService.getById(id));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update product")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Product> update(@PathVariable Long id, @RequestBody Product product) {
-        return ResponseEntity.ok(productService.update(id, product));
+    public ResponseEntity<ProductResponse> update(@PathVariable Long id, @RequestBody ProductRequest request) {
+        return ResponseEntity.ok(productService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
@@ -61,7 +62,7 @@ public class ProductController {
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/search")
     @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
-    public ResponseEntity<Page<Product>> searchProducts(
+    public ResponseEntity<Page<ProductResponse>> searchProducts(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice,
@@ -69,7 +70,7 @@ public class ProductController {
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "id") String sort
     ) {
-        Page<Product> result = productService.searchProducts(name, minPrice, maxPrice, page, size, sort);
+        Page<ProductResponse> result = productService.searchProducts(name, minPrice, maxPrice, page, size, sort);
         return ResponseEntity.ok(result);
     }
 }

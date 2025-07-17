@@ -1,7 +1,9 @@
 package com.cyan.shop.service;
 
+import com.cyan.shop.dto.ProductRequest;
 import com.cyan.shop.dto.ProductResponse;
 import com.cyan.shop.entity.Product;
+import com.cyan.shop.mapper.ProductMapper;
 import com.cyan.shop.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,42 +20,40 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
-    public Product create(Product product) {
-        return productRepository.save(product);
+    public ProductResponse create(ProductRequest request) {
+        Product product = productMapper.toEntity(request);
+        productRepository.save(product);
+        return productMapper.toDto(product);
     }
 
     public List<ProductResponse> getAll() {
-        return productRepository.findAll().stream().map(product -> {
-            ProductResponse dto = new ProductResponse();
-            dto.setId(product.getId());
-            dto.setName(product.getName());
-            dto.setDescription(product.getDescription());
-            dto.setPrice(product.getPrice());
-            return dto;
-        }).toList();
+        return productRepository.findAll().stream().map(productMapper::toDto).toList();
     }
 
-    public Product getById(Long id) {
-        return productRepository.findById(id)
+    public ProductResponse getById(Long id) {
+        Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
+        return productMapper.toDto(product);
     }
 
-    public Product update(Long id, Product updatedProduct) {
-        Product existing = getById(id);
-        existing.setName(updatedProduct.getName());
-        existing.setDescription(updatedProduct.getDescription());
-        existing.setPrice(updatedProduct.getPrice());
-        existing.setQuantity(updatedProduct.getQuantity());
-        return productRepository.save(existing);
+    public ProductResponse update(Long id, ProductRequest request) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        productMapper.updateProduct(product, request);
+        productRepository.save(product);
+        return productMapper.toDto(product);
     }
 
     public void delete(Long id) {
         productRepository.deleteById(id);
     }
 
-    public Page<Product> searchProducts(String name, Double min, Double max, int page, int size, String sortBy) {
+    public Page<ProductResponse> searchProducts(String name, Double min, Double max, int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        return productRepository.search(name, min, max, pageable);
+        Page<Product> products = productRepository.search(name, min, max, pageable);
+        return products.map(productMapper::toDto);
     }
+
 }
