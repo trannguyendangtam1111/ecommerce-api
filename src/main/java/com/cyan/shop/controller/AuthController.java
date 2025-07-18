@@ -3,6 +3,7 @@ package com.cyan.shop.controller;
 import com.cyan.shop.dto.LoginRequest;
 import com.cyan.shop.dto.LoginResponse;
 import com.cyan.shop.dto.RegisterRequest;
+import com.cyan.shop.dto.UserResponse;
 import com.cyan.shop.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +14,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Authentication", description = "API for register and login")
@@ -22,7 +25,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "Register new user")
-    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(userService.register(request));
     }
 
@@ -32,8 +35,17 @@ public class AuthController {
         return ResponseEntity.ok(userService.login(request));
     }
 
-//    @DeleteMapping("/delete")
-//    public ResponseEntity<String> delete(@AuthenticationPrincipal String email) {
-//        return ResponseEntity.ok(userService.deleteUserByEmail(email));
-//    }
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+        List<UserResponse> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUserById(id);
+        return ResponseEntity.noContent().build();
+    }
 }

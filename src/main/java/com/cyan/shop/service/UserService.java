@@ -8,58 +8,33 @@ import com.cyan.shop.entity.User;
 import com.cyan.shop.exception.EmailAlreadyExistsException;
 import com.cyan.shop.exception.NameAlreadyExistsException;
 import com.cyan.shop.exception.NotFoundException;
+import com.cyan.shop.mapper.UserMapper;
 import com.cyan.shop.repository.UserRepository;
 import com.cyan.shop.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final UserMapper userMapper;
 
-    public String register(RegisterRequest request) {
+    public UserResponse register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("Email already exists");
         }
-
         if(userRepository.existsByName(request.getName())) {
             throw new NameAlreadyExistsException("Name already exists");
         }
-
-
-        User user = User.builder()
-                .name(request.getName())
-                .email(request.getEmail())
-                .password(request.getPassword()) //todo...BCrypt
-                .role("CUSTOMER")
-                .build();
-
+        User user = userMapper.toEntity(request);
         userRepository.save(user);
-
-        return "User registered successfully";
+        return userMapper.toDto(user);
     }
-
-//    public UserResponse register(RegisterRequest request) {
-//        User user = User.builder()
-//                .email(request.getEmail())
-//                .password(request.getPassword())
-//                .name(request.getName())
-//                .role("CUSTOMER")
-//                .build();
-//
-//        userRepository.save(user);
-//
-//        UserResponse dto = new UserResponse();
-//        dto.setId(user.getId());
-//        dto.setName(user.getName());
-//        dto.setEmail(user.getEmail());
-//
-//        return dto;
-//    }
 
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
@@ -68,24 +43,20 @@ public class UserService {
         if (!user.getPassword().equals(request.getPassword())) {
             throw new RuntimeException("Invalid email or password");
         }
-
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
         return new LoginResponse(token);
     }
 
-//    public String deleteUser(String token) {
-//        String email = jwtUtil.extractEmail(token);
-//        User user = userRepository.findByEmail(email)
-//                .orElseThrow(() -> new NotFoundException("User not found"));
-//        userRepository.delete(user);
-//        return "User deleted successfully";
-//    }
-//
-//    public String deleteUserByEmail(String email) {
-//        User user = userRepository.findByEmail(email)
-//                .orElseThrow(() -> new NotFoundException("User not found"));
-//        userRepository.deleteByEmail(email);
-//        userRepository.delete(user);
-//        return "User deleted successfully";
-//    }
+    public List<UserResponse> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(userMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public void deleteUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User does not exist"));
+        userRepository.delete(user);
+    }
 }
