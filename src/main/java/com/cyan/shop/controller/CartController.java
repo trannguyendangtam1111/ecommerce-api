@@ -1,7 +1,9 @@
 package com.cyan.shop.controller;
 
+import com.cyan.shop.dto.AddToCartRequest;
 import com.cyan.shop.dto.CartItemResponse;
 import com.cyan.shop.entity.CartItem;
+import com.cyan.shop.security.CustomUserDetails;
 import com.cyan.shop.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,17 +25,31 @@ public class CartController {
     @PostMapping
     @Operation(summary = "Add products to cart")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<String> add(@RequestParam Long productId,
-                                @RequestParam int quantity,
-                                @AuthenticationPrincipal String email){
-        cartService.addToCart(email, productId, quantity);
+    public ResponseEntity<String> add(@RequestBody AddToCartRequest request,
+                                      @AuthenticationPrincipal CustomUserDetails user) {
+        cartService.addToCart(request, user.getId());
         return ResponseEntity.ok("Successfully added product");
     }
 
     @GetMapping
     @Operation(summary = "View my cart")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<List<CartItemResponse>> view(@AuthenticationPrincipal String email){
-        return ResponseEntity.ok(cartService.getCart(email));
+    public ResponseEntity<List<CartItemResponse>> view(@AuthenticationPrincipal CustomUserDetails user){
+        return ResponseEntity.ok(cartService.getCart(user.getId()));
+    }
+
+    @DeleteMapping("/product/{productId}")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<String> removeProduct(@PathVariable Long productId,
+                                                @AuthenticationPrincipal CustomUserDetails user) {
+        cartService.removeProductFromCart(user.getId(), productId);
+        return ResponseEntity.ok("Successfully removed product from cart");
+    }
+
+    @DeleteMapping("/clear")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<String> clearCart(@AuthenticationPrincipal CustomUserDetails user) {
+        cartService.clearCart(user.getId());
+        return ResponseEntity.ok("Cart has been cleared");
     }
 }
