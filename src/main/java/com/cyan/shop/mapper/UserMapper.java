@@ -10,7 +10,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    @Mapping(target = "role", constant = "CUSTOMER")
+    @Mapping(target = "role", constant = "ADMIN")
     User toEntity(RegisterRequest registerRequest);
     UserResponse toDto(User user);
 }

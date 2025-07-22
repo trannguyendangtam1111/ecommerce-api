@@ -4,6 +4,7 @@ import com.cyan.shop.dto.LoginRequest;
 import com.cyan.shop.dto.LoginResponse;
 import com.cyan.shop.dto.RegisterRequest;
 import com.cyan.shop.dto.UserResponse;
+import com.cyan.shop.entity.User;
 import com.cyan.shop.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,8 +38,8 @@ public class AuthController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
-        List<UserResponse> users = userService.getAllUsers();
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
