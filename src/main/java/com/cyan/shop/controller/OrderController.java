@@ -2,6 +2,7 @@ package com.cyan.shop.controller;
 
 import com.cyan.shop.dto.OrderResponse;
 import com.cyan.shop.entity.Order;
+import com.cyan.shop.security.CustomUserDetails;
 import com.cyan.shop.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,21 +24,15 @@ public class OrderController {
     @PostMapping
     @Operation(summary = "Create orders")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<Order> placeOrders(@AuthenticationPrincipal String email) {
-        return ResponseEntity.ok(orderService.placeOrder(email));
+    public ResponseEntity<OrderResponse> placeOrders(@AuthenticationPrincipal CustomUserDetails user) {
+        return ResponseEntity.ok(orderService.placeOrder(user.getEmail()));
     }
-
-    //@PostMapping
-    //@Operation(summary = "Create orders")
-    //public ResponseEntity<String> createOrder(@AuthenticationPrincipal String email) {
-    //    return ResponseEntity.ok("Successfully added orders");
-    //}
 
     @GetMapping("/me")
     @Operation(summary = "View all orders")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<List<OrderResponse>> myOrders(@AuthenticationPrincipal String email) {
-        return ResponseEntity.ok(orderService.getMyOrders(email));
+    public ResponseEntity<List<OrderResponse>> myOrders(@AuthenticationPrincipal CustomUserDetails user) {
+        return ResponseEntity.ok(orderService.getMyOrders(user.getEmail()));
     }
 
     @GetMapping
