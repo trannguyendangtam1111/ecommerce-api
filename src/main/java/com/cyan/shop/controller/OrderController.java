@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,15 +25,15 @@ public class OrderController {
     @PostMapping
     @Operation(summary = "Create orders")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<OrderResponse> placeOrders(@AuthenticationPrincipal CustomUserDetails user) {
-        return ResponseEntity.ok(orderService.placeOrder(user.getEmail()));
+    public ResponseEntity<OrderResponse> placeOrders(@AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(orderService.placeOrder(jwt.getClaim("email")));
     }
 
     @GetMapping("/me")
     @Operation(summary = "View all orders")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<List<OrderResponse>> myOrders(@AuthenticationPrincipal CustomUserDetails user) {
-        return ResponseEntity.ok(orderService.getMyOrders(user.getEmail()));
+    public ResponseEntity<List<OrderResponse>> myOrders(@AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(orderService.getMyOrders(jwt.getClaim("email")));
     }
 
     @GetMapping

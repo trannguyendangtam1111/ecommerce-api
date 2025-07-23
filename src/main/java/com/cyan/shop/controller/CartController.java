@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,16 +27,17 @@ public class CartController {
     @Operation(summary = "Add products to cart")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<String> add(@RequestBody AddToCartRequest request,
-                                      @AuthenticationPrincipal CustomUserDetails user) {
-        cartService.addToCart(request, user.getId());
+                                      @AuthenticationPrincipal Jwt jwt) {
+
+        cartService.addToCart(request, jwt.getClaim("id"));
         return ResponseEntity.ok("Successfully added product");
     }
 
     @GetMapping
     @Operation(summary = "View my cart")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<List<CartItemResponse>> view(@AuthenticationPrincipal CustomUserDetails user){
-        return ResponseEntity.ok(cartService.getCart(user.getId()));
+    public ResponseEntity<List<CartItemResponse>> view(@AuthenticationPrincipal Jwt jwt){
+        return ResponseEntity.ok(cartService.getCart(jwt.getClaim("id")));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -47,15 +49,15 @@ public class CartController {
     @DeleteMapping("/product/{productId}")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<String> removeProduct(@PathVariable Long productId,
-                                                @AuthenticationPrincipal CustomUserDetails user) {
-        cartService.removeProductFromCart(user.getId(), productId);
+                                                @AuthenticationPrincipal Jwt jwt) {
+        cartService.removeProductFromCart(jwt.getClaim("id"), productId);
         return ResponseEntity.ok("Successfully removed product from cart");
     }
 
     @DeleteMapping("/clear")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<String> clearCart(@AuthenticationPrincipal CustomUserDetails user) {
-        cartService.clearCart(user.getId());
+    public ResponseEntity<String> clearCart(@AuthenticationPrincipal Jwt jwt) {
+        cartService.clearCart(jwt.getClaim("id"));
         return ResponseEntity.ok("Cart has been cleared");
     }
 }

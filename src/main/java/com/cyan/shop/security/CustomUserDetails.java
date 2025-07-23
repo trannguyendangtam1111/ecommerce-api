@@ -1,6 +1,7 @@
 package com.cyan.shop.security;
 
 import com.cyan.shop.entity.User;
+import io.jsonwebtoken.Claims;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,12 +19,12 @@ public class CustomUserDetails implements UserDetails {
     private final String password;
     private final String role;
 
-    public static CustomUserDetails fromUser(User user) {
+    public static CustomUserDetails fromClaims(Claims claims) {
         return new CustomUserDetails(
-                user.getId(),
-                user.getEmail(),
-                user.getPassword(),
-                user.getRole()
+                Long.valueOf(claims.get("id").toString()),
+                claims.get("email", String.class),
+                claims.get("password", String.class),
+                claims.get("role", String.class)
         );
     }
 
