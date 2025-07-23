@@ -38,6 +38,12 @@ public class CartController {
         return ResponseEntity.ok(cartService.getCart(user.getId()));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<CartItemResponse>> viewUserCart(@PathVariable Long userId) {
+        return ResponseEntity.ok(cartService.getUserCart(userId));
+    }
+
     @DeleteMapping("/product/{productId}")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<String> removeProduct(@PathVariable Long productId,

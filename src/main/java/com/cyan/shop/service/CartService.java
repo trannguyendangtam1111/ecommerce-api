@@ -52,6 +52,14 @@ public class CartService {
         return cartMapper.toDtoList(cartItems);
     }
 
+    public List<CartItemResponse> getUserCart(Long userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        List<CartItem> cartItems = cartRepo.findByUser(user);
+
+        return cartMapper.toDtoList(cartItems);
+    }
+
     public void removeProductFromCart(Long userId, Long productId) {
         CartItem cartItem = cartRepo.findByUserIdAndProductId(userId, productId)
                 .orElseThrow(() -> new NotFoundException("Product not found in cart"));
