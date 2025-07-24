@@ -1,6 +1,7 @@
 package com.cyan.shop.security;
 
 import com.cyan.shop.entity.User;
+import com.cyan.shop.enums.Role;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -29,7 +31,9 @@ public class JwtUtil {
                 .setSubject(user.getEmail())
                 .claim("id", user.getId())
                 .claim("email", user.getEmail())
-                .claim("role", List.of(user.getRole()))
+                .claim("roles", user.getRoles().stream()
+                        .map(Role::name)
+                        .collect(Collectors.toList()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
@@ -54,12 +58,12 @@ public class JwtUtil {
         }
     }
 
-    public String extractRole(String token) {
+    public String extractRoles(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
-                .get("role", String.class);
+                .get("roles", String.class);
     }
 }

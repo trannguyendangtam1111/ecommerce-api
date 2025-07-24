@@ -10,6 +10,7 @@ import com.cyan.shop.exception.EmailAlreadyExistsException;
 import com.cyan.shop.exception.NameAlreadyExistsException;
 import com.cyan.shop.exception.NotFoundException;
 import com.cyan.shop.mapper.UserMapper;
+import com.cyan.shop.repository.CartItemRepository;
 import com.cyan.shop.repository.OrderItemRepository;
 import com.cyan.shop.repository.OrderRepository;
 import com.cyan.shop.repository.UserRepository;
@@ -31,6 +32,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
+    private final CartItemRepository cartItemRepository;
 
     public UserResponse register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -56,7 +58,7 @@ public class UserService {
             throw new RuntimeException("Invalid email or password");
         }
         String token = jwtUtil.generateToken(user);
-        return new LoginResponse(token, user.getRole());
+        return new LoginResponse(token, user.getRoles());
     }
 
 //    public List<UserResponse> getAllUsers() {
@@ -80,6 +82,7 @@ public class UserService {
         for (Order order : orders) {
             orderItemRepository.deleteByOrder(order);
         }
+        cartItemRepository.deleteByUserId(id);
         orderRepository.deleteByUser(user);
         userRepository.delete(user);
     }

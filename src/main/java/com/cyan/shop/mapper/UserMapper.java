@@ -8,9 +8,11 @@ import com.cyan.shop.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+import java.util.Set;
+
+@Mapper(componentModel = "spring", imports = Set.class)
 public interface UserMapper {
-    @Mapping(target = "role", constant = "CUSTOMER")
+    @Mapping(target = "roles", expression = "java(Set.of(com.cyan.shop.enums.Role.ADMIN))")
     User toEntity(RegisterRequest registerRequest);
     UserResponse toDto(User user);
 }
